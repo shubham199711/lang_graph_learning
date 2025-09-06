@@ -51,12 +51,12 @@ def model_call(state: AgentState) -> AgentState:
     return {"messages": [response]}
 
 
-def should_continue(state: AgentState) -> str:
+def should_make_tool_call(state: AgentState) -> str:
     last_msg = state["messages"][-1]
-    if not last_msg.tool_calls:
-        return "end"
+    if last_msg.tool_calls:
+        return "tools_calls"
     else:
-        return "continue"
+        return "end"
 
 
 graph = StateGraph(AgentState)
@@ -69,10 +69,10 @@ graph.add_node("tools", tool_node)
 graph.set_entry_point("our_agent")
 
 graph.add_conditional_edges(
-    "our_agent", should_continue, {"continue": "tools", "end": END}
+    "our_agent", should_make_tool_call, {"tools_calls": "tools", "end": END}
 )
 
-graph.add_edge("tools", "our_agent")
+graph.add_edge("tools", "our_agent")  # tools call automatically goes back to agent.
 
 app = graph.compile()
 
