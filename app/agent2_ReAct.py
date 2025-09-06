@@ -1,3 +1,4 @@
+from operator import mul
 from langchain_core.messages import SystemMessage, ToolMessage, BaseMessage
 from langgraph.graph import StateGraph, START, END
 from typing import TypedDict, Annotated, Sequence
@@ -8,14 +9,19 @@ from langchain_core.tools import tool
 import os
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from urllib3 import response
 
 load_dotenv()
 
 
 @tool
 def add(a: int, b: int) -> int:
-    """This is addition function which add two numbers"""
+    """This is addition function which add two numbers int, int"""
+    return a + b
+
+
+@tool
+def multiply(a: int, b: int) -> int:
+    """This is multiply function which multiply two numbers int, int"""
     return a + b
 
 
@@ -23,7 +29,7 @@ class AgentState(TypedDict):
     messages: Annotated[Sequence[BaseMessage], add_messages]
 
 
-tools = [add]
+tools = [add, multiply]
 
 llm = ChatGoogleGenerativeAI(
     api_key=os.getenv("GOOGLE_API_KEY"),
